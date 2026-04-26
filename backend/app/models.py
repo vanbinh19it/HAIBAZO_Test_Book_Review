@@ -108,6 +108,114 @@ class ItemsPublic(SQLModel):
     count: int
 
 
+# Shared properties
+class AuthorBase(SQLModel):
+    name: str = Field(min_length=1, max_length=255)
+
+
+class AuthorCreate(AuthorBase):
+    pass
+
+
+class AuthorUpdate(SQLModel):
+    name: str | None = Field(default=None, min_length=1, max_length=255)
+
+
+class Author(AuthorBase, table=True):
+    id: int | None = Field(default=None, primary_key=True)
+    created_at: datetime | None = Field(
+        default_factory=get_datetime_utc,
+        sa_type=DateTime(timezone=True),  # type: ignore
+    )
+    books: list["Book"] = Relationship(back_populates="author", cascade_delete=True)
+
+
+class AuthorPublic(AuthorBase):
+    id: int
+    books_count: int | None = None
+    created_at: datetime | None = None
+
+
+class AuthorsPublic(SQLModel):
+    data: list[AuthorPublic]
+    count: int
+    page: int | None = None
+    limit: int | None = None 
+    total: int | None = None
+    total_pages: int | None = None
+
+
+# Shared properties
+class BookBase(SQLModel):
+    title: str = Field(min_length=1, max_length=255)
+
+
+class BookCreate(BookBase):
+    author_id: int
+
+
+class BookUpdate(SQLModel):
+    title: str | None = Field(default=None, min_length=1, max_length=255)
+    author_id: int | None = None
+
+
+class Book(BookBase, table=True):
+    id: int | None = Field(default=None, primary_key=True)
+    author_id: int = Field(foreign_key="author.id", nullable=False, ondelete="CASCADE")
+    created_at: datetime | None = Field(
+        default_factory=get_datetime_utc,
+        sa_type=DateTime(timezone=True),  # type: ignore
+    )
+    author: Author | None = Relationship(back_populates="books")
+    reviews: list["Review"] = Relationship(back_populates="book", cascade_delete=True)
+
+
+class BookPublic(BookBase):
+    id: int
+    author_id: int
+    created_at: datetime | None = None
+
+
+class BooksPublic(SQLModel):
+    data: list[BookPublic]
+    count: int
+
+
+# Shared properties
+class ReviewBase(SQLModel):
+    content: str = Field(min_length=1)
+
+
+class ReviewCreate(ReviewBase):
+    book_id: int
+
+
+class ReviewUpdate(SQLModel):
+    book_id: int | None = None
+    content: str | None = Field(default=None, min_length=1)
+
+
+class Review(ReviewBase, table=True):
+    id: int | None = Field(default=None, primary_key=True)
+    book_id: int = Field(foreign_key="book.id", nullable=False, ondelete="CASCADE")
+    created_at: datetime | None = Field(
+        default_factory=get_datetime_utc,
+        sa_type=DateTime(timezone=True),  # type: ignore
+    )
+    book: Book | None = Relationship(back_populates="reviews")
+
+
+class ReviewPublic(ReviewBase):
+    id: int
+    book_id: int
+    created_at: datetime | None = None
+
+
+class ReviewsPublic(SQLModel):
+    data: list[ReviewPublic]
+    count: int
+
+
 # Generic message
 class Message(SQLModel):
     message: str
