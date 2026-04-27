@@ -17,7 +17,15 @@ const baseItems: Item[] = [
       { title: "Create", path: "/authors/create" },
     ],
   },
-  { icon: Briefcase, title: "Items", path: "/items" },
+  {
+    icon: Briefcase,
+    title: "Books",
+    path: "/books",
+    children: [
+      { title: "List", path: "/books" },
+      { title: "Create", path: "/books/create" },
+    ],
+  },
 ]
 
 export function AppSidebar() {
