@@ -413,7 +413,7 @@
 * 👷 Use `uv` for Python env to generate client. PR [#1362](https://github.com/fastapi/full-stack-fastapi-template/pull/1362) by [@tiangolo](https://github.com/tiangolo).
 * 👷 Run tests from Python environment (with `uv`), not from Docker container. PR [#1361](https://github.com/fastapi/full-stack-fastapi-template/pull/1361) by [@tiangolo](https://github.com/tiangolo).
 * 🔨 Update `generate-client.sh` script, make it fail on errors, fix generation. PR [#1360](https://github.com/fastapi/full-stack-fastapi-template/pull/1360) by [@tiangolo](https://github.com/tiangolo).
-* 👷 Add GitHub Actions workflow to lint backend apart from tests. PR [#1358](https://github.com/fastapi/full-stack-fastapi-template/pull/1358) by [@tiangolo](https://github.com/tiangolo).
+* 👷 Add GitHub Actions workflow to lint backend apart from app.tests. PR [#1358](https://github.com/fastapi/full-stack-fastapi-template/pull/1358) by [@tiangolo](https://github.com/tiangolo).
 * 👷 Improve playwright CI job. PR [#1335](https://github.com/fastapi/full-stack-fastapi-template/pull/1335) by [@patrick91](https://github.com/patrick91).
 * 👷 Update `issue-manager.yml`. PR [#1329](https://github.com/fastapi/full-stack-fastapi-template/pull/1329) by [@tiangolo](https://github.com/tiangolo).
 * 💚 Set `include-hidden-files` to `True` when using the `upload-artifact` GH action. PR [#1327](https://github.com/fastapi/full-stack-fastapi-template/pull/1327) by [@svlandeg](https://github.com/svlandeg).

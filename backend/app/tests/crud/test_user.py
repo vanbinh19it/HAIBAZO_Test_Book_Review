@@ -5,7 +5,7 @@ from sqlmodel import Session
 from app import crud
 from app.core.security import verify_password
 from app.models import User, UserCreate, UserUpdate
-from tests.utils.utils import random_email, random_lower_string
+from app.tests.utils.utils import random_email, random_lower_string
 
 
 def test_create_user(db: Session) -> None:
