@@ -1,5 +1,6 @@
 import { Link as RouterLink, useRouterState } from "@tanstack/react-router"
-import type { LucideIcon } from "lucide-react"
+import { ChevronRight, type LucideIcon } from "lucide-react"
+import { useEffect, useMemo, useState } from "react"
 
 import {
   SidebarGroup,
@@ -7,6 +8,9 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarMenuSub,
+  SidebarMenuSubButton,
+  SidebarMenuSubItem,
   useSidebar,
 } from "@/components/ui/sidebar"
 
@@ -14,6 +18,10 @@ export type Item = {
   icon: LucideIcon
   title: string
   path: string
+  children?: Array<{
+    title: string
+    path: string
+  }>
 }
 
 interface MainProps {
@@ -24,6 +32,30 @@ export function Main({ items }: MainProps) {
   const { isMobile, setOpenMobile } = useSidebar()
   const router = useRouterState()
   const currentPath = router.location.pathname
+  const [openMenus, setOpenMenus] = useState<Record<string, boolean>>({})
+
+  const activeMenuTitles = useMemo(
+    () =>
+      items
+        .filter(
+          (item) =>
+            item.children?.some((child) => child.path === currentPath) ?? false,
+        )
+        .map((item) => item.title),
+    [items, currentPath],
+  )
+
+  useEffect(() => {
+    if (activeMenuTitles.length === 0) return
+
+    setOpenMenus((prev) => {
+      const next = { ...prev }
+      activeMenuTitles.forEach((title) => {
+        next[title] = true
+      })
+      return next
+    })
+  }, [activeMenuTitles])
 
   const handleMenuClick = () => {
     if (isMobile) {
@@ -31,25 +63,67 @@ export function Main({ items }: MainProps) {
     }
   }
 
+  const toggleMenu = (title: string) => {
+    setOpenMenus((prev) => ({
+      ...prev,
+      [title]: !prev[title],
+    }))
+  }
+
   return (
     <SidebarGroup>
       <SidebarGroupContent>
         <SidebarMenu>
           {items.map((item) => {
-            const isActive = currentPath === item.path
+            const isActive =
+              currentPath === item.path ||
+              item.children?.some((child) => child.path === currentPath) ||
+              false
 
             return (
               <SidebarMenuItem key={item.title}>
-                <SidebarMenuButton
-                  tooltip={item.title}
-                  isActive={isActive}
-                  asChild
-                >
-                  <RouterLink to={item.path} onClick={handleMenuClick}>
+                {item.children && item.children.length > 0 ? (
+                  <SidebarMenuButton
+                    tooltip={item.title}
+                    isActive={isActive}
+                    onClick={() => toggleMenu(item.title)}
+                  >
                     <item.icon />
                     <span>{item.title}</span>
-                  </RouterLink>
-                </SidebarMenuButton>
+                    <ChevronRight
+                      className={`ml-auto transition-transform ${
+                        openMenus[item.title] ? "rotate-90" : ""
+                      }`}
+                    />
+                  </SidebarMenuButton>
+                ) : (
+                  <SidebarMenuButton
+                    tooltip={item.title}
+                    isActive={isActive}
+                    asChild
+                  >
+                    <RouterLink to={item.path} onClick={handleMenuClick}>
+                      <item.icon />
+                      <span>{item.title}</span>
+                    </RouterLink>
+                  </SidebarMenuButton>
+                )}
+                {item.children && item.children.length > 0 && openMenus[item.title] ? (
+                  <SidebarMenuSub>
+                    {item.children.map((child) => (
+                      <SidebarMenuSubItem key={`${item.title}-${child.title}`}>
+                        <SidebarMenuSubButton
+                          asChild
+                          isActive={currentPath === child.path}
+                        >
+                          <RouterLink to={child.path} onClick={handleMenuClick}>
+                            <span>{child.title}</span>
+                          </RouterLink>
+                        </SidebarMenuSubButton>
+                      </SidebarMenuSubItem>
+                    ))}
+                  </SidebarMenuSub>
+                ) : null}
               </SidebarMenuItem>
             )
           })}

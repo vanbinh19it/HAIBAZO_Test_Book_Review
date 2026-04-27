@@ -1,6 +1,7 @@
 from typing import Any
 
 from fastapi import APIRouter, HTTPException, Query
+from sqlalchemy.exc import IntegrityError
 from sqlmodel import col, func, select
 
 from app.api.authz import ensure_owner_or_superuser
@@ -17,6 +18,10 @@ from app.models import (
 )
 
 router = APIRouter(prefix="/authors", tags=["authors"])
+
+
+def normalize_author_name(name: str) -> str:
+    return name.strip()
 
 
 def to_author_public(author: Author, books_count: int) -> AuthorPublic:
@@ -44,7 +49,7 @@ def read_authors(
         count_statement = count_statement.where(Author.owner_id == _current_user.id)
     count = session.exec(count_statement).one()
     skip, total_pages = get_pagination(page=page, page_size=page_size, total=count)
-    statement = select(Author).order_by(col(Author.created_at).desc())
+    statement = select(Author).order_by(col(Author.created_at).asc())
     if not _current_user.is_superuser:
         statement = statement.where(Author.owner_id == _current_user.id)
     statement = statement.offset(skip).limit(page_size)
@@ -100,7 +105,10 @@ def create_author(
     """
     Create new author.
     """
-    existing_author_statement = select(Author).where(Author.name == author_in.name)
+    normalized_name = normalize_author_name(author_in.name)
+    if not normalized_name:
+        raise HTTPException(status_code=422, detail="Name is required")
+    existing_author_statement = select(Author).where(Author.name == normalized_name)
     if not _current_user.is_superuser:
         existing_author_statement = existing_author_statement.where(
             Author.owner_id == _current_user.id
@@ -109,9 +117,15 @@ def create_author(
     if existing_author:
         raise HTTPException(status_code=400, detail="Author already exists")
 
-    author = Author.model_validate(author_in, update={"owner_id": _current_user.id})
+    author = Author.model_validate(
+        author_in, update={"owner_id": _current_user.id, "name": normalized_name}
+    )
     session.add(author)
-    session.commit()
+    try:
+        session.commit()
+    except IntegrityError:
+        session.rollback()
+        raise HTTPException(status_code=400, detail="Author already exists") from None
     session.refresh(author)
 
     return to_author_public(author=author, books_count=0)
@@ -138,6 +152,9 @@ def update_author(
 
     update_dict = author_in.model_dump(exclude_unset=True)
     if "name" in update_dict:
+        update_dict["name"] = normalize_author_name(update_dict["name"])
+        if not update_dict["name"]:
+            raise HTTPException(status_code=422, detail="Name is required")
         existing_author_statement = select(Author).where(
             Author.name == update_dict["name"], Author.id != id
         )
@@ -151,7 +168,11 @@ def update_author(
 
     author.sqlmodel_update(update_dict)
     session.add(author)
-    session.commit()
+    try:
+        session.commit()
+    except IntegrityError:
+        session.rollback()
+        raise HTTPException(status_code=400, detail="Author already exists") from None
     session.refresh(author)
     books_count_statement = select(func.count()).select_from(Book).where(Book.author_id == id)
     books_count = session.exec(books_count_statement).one()

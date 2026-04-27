@@ -1,5 +1,7 @@
 import {
   type ColumnDef,
+  type OnChangeFn,
+  type PaginationState,
   flexRender,
   getCoreRowModel,
   getPaginationRowModel,
@@ -32,18 +34,46 @@ import {
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
+  defaultPageSize?: number
+  pageSizeOptions?: number[]
+  paginationState?: PaginationState
+  onPaginationChange?: OnChangeFn<PaginationState>
+  manualPagination?: boolean
+  rowCount?: number
+  pageCount?: number
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
+  defaultPageSize = 10,
+  pageSizeOptions = [5, 10, 25, 50],
+  paginationState,
+  onPaginationChange,
+  manualPagination = false,
+  rowCount,
+  pageCount,
 }: DataTableProps<TData, TValue>) {
   const table = useReactTable({
     data,
     columns,
+    initialState: {
+      pagination: {
+        pageSize: defaultPageSize,
+      },
+    },
+    state: paginationState ? { pagination: paginationState } : undefined,
+    onPaginationChange,
+    manualPagination,
+    rowCount,
+    pageCount,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
   })
+  const pagination = table.getState().pagination
+  const totalRows = manualPagination ? (rowCount ?? data.length) : data.length
+  const from = totalRows === 0 ? 0 : pagination.pageIndex * pagination.pageSize + 1
+  const to = Math.min((pagination.pageIndex + 1) * pagination.pageSize, totalRows)
 
   return (
     <div className="flex flex-col gap-4">
@@ -95,17 +125,11 @@ export function DataTable<TData, TValue>({
           <div className="flex flex-col sm:flex-row sm:items-center gap-4">
             <div className="text-sm text-muted-foreground">
               Showing{" "}
-              {table.getState().pagination.pageIndex *
-                table.getState().pagination.pageSize +
-                1}{" "}
+              {from}{" "}
               to{" "}
-              {Math.min(
-                (table.getState().pagination.pageIndex + 1) *
-                  table.getState().pagination.pageSize,
-                data.length,
-              )}{" "}
+              {to}{" "}
               of{" "}
-              <span className="font-medium text-foreground">{data.length}</span>{" "}
+              <span className="font-medium text-foreground">{totalRows}</span>{" "}
               entries
             </div>
             <div className="flex items-center gap-x-2">
@@ -122,7 +146,7 @@ export function DataTable<TData, TValue>({
                   />
                 </SelectTrigger>
                 <SelectContent side="top">
-                  {[5, 10, 25, 50].map((pageSize) => (
+                  {pageSizeOptions.map((pageSize) => (
                     <SelectItem key={pageSize} value={`${pageSize}`}>
                       {pageSize}
                     </SelectItem>

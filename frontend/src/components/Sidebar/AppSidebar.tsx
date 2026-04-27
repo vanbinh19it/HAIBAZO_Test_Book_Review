@@ -1,4 +1,4 @@
-import { Briefcase, Users } from "lucide-react"
+import { BookUser, Briefcase, Users } from "lucide-react"
 import {
   Sidebar,
   SidebarContent,
@@ -8,6 +8,15 @@ import { type Item, Main } from "./Main"
 import { User } from "./User"
 
 const baseItems: Item[] = [
+  {
+    icon: BookUser,
+    title: "Authors",
+    path: "/authors",
+    children: [
+      { title: "List", path: "/authors" },
+      { title: "Create", path: "/authors/create" },
+    ],
+  },
   { icon: Briefcase, title: "Items", path: "/items" },
 ]
 
@@ -20,7 +29,6 @@ export function AppSidebar() {
 
   return (
     <Sidebar collapsible="icon">
-     
       <SidebarContent className="px-4 py-6 group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:items-center">
         <Main items={items} />
       </SidebarContent>
