@@ -3,6 +3,7 @@ from typing import Any
 from fastapi import APIRouter, HTTPException, Query
 from sqlmodel import col, func, select
 
+from app.api.authz import ensure_owner_or_superuser
 from app.api.deps import CurrentUser, SessionDep
 from app.api.pagination import get_pagination
 from app.models import (
@@ -107,8 +108,10 @@ def read_review(session: SessionDep, _current_user: CurrentUser, id: int) -> Any
     review = session.get(Review, id)
     if not review:
         raise HTTPException(status_code=404, detail="Review not found")
-    if not _current_user.is_superuser and (review.owner_id != _current_user.id):
-        raise HTTPException(status_code=403, detail="Not enough permissions")
+    ensure_owner_or_superuser(
+        current_user=_current_user,
+        entity_owner_id=review.owner_id,
+    )
 
     book = session.get(Book, review.book_id)
     author_name: str | None = None
@@ -134,11 +137,14 @@ def create_review(
     Create new review.
     """
     book = check_book_exists(session=session, book_id=review_in.book_id)
-    if not _current_user.is_superuser and (book.owner_id != _current_user.id):
-        raise HTTPException(status_code=403, detail="Not enough permissions")
+    ensure_owner_or_superuser(
+        current_user=_current_user,
+        entity_owner_id=book.owner_id,
+    )
     author = session.get(Author, book.author_id)
 
-    review = Review.model_validate(review_in, update={"owner_id": _current_user.id})
+    # Enforce ownership consistency with parent book.
+    review = Review.model_validate(review_in, update={"owner_id": book.owner_id})
     session.add(review)
     session.commit()
     session.refresh(review)
@@ -163,17 +169,23 @@ def update_review(
     review = session.get(Review, id)
     if not review:
         raise HTTPException(status_code=404, detail="Review not found")
-    if not _current_user.is_superuser and (review.owner_id != _current_user.id):
-        raise HTTPException(status_code=403, detail="Not enough permissions")
+    ensure_owner_or_superuser(
+        current_user=_current_user,
+        entity_owner_id=review.owner_id,
+    )
 
     update_dict = review_in.model_dump(exclude_unset=True)
     target_book_id = update_dict.get("book_id", review.book_id)
     book = check_book_exists(session=session, book_id=target_book_id)
-    if not _current_user.is_superuser and (book.owner_id != _current_user.id):
-        raise HTTPException(status_code=403, detail="Not enough permissions")
+    ensure_owner_or_superuser(
+        current_user=_current_user,
+        entity_owner_id=book.owner_id,
+    )
     author = session.get(Author, book.author_id)
 
     review.sqlmodel_update(update_dict)
+    # Keep owner aligned with parent book owner.
+    review.owner_id = book.owner_id
     session.add(review)
     session.commit()
     session.refresh(review)
@@ -192,8 +204,10 @@ def delete_review(session: SessionDep, _current_user: CurrentUser, id: int) -> M
     review = session.get(Review, id)
     if not review:
         raise HTTPException(status_code=404, detail="Review not found")
-    if not _current_user.is_superuser and (review.owner_id != _current_user.id):
-        raise HTTPException(status_code=403, detail="Not enough permissions")
+    ensure_owner_or_superuser(
+        current_user=_current_user,
+        entity_owner_id=review.owner_id,
+    )
 
     session.delete(review)
     session.commit()

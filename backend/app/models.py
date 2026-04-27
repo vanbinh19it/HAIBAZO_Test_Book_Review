@@ -125,8 +125,8 @@ class Author(AuthorBase, table=True):
     __table_args__ = (UniqueConstraint("name", "owner_id", name="uq_author_name_owner"),)
 
     id: int | None = Field(default=None, primary_key=True)
-    owner_id: uuid.UUID | None = Field(
-        default=None, foreign_key="user.id", nullable=True, ondelete="CASCADE"
+    owner_id: uuid.UUID = Field(
+        foreign_key="user.id", nullable=False, ondelete="CASCADE"
     )
     created_at: datetime | None = Field(
         default_factory=get_datetime_utc,
@@ -172,8 +172,8 @@ class Book(BookBase, table=True):
 
     id: int | None = Field(default=None, primary_key=True)
     author_id: int = Field(foreign_key="author.id", nullable=False, ondelete="CASCADE")
-    owner_id: uuid.UUID | None = Field(
-        default=None, foreign_key="user.id", nullable=True, ondelete="CASCADE"
+    owner_id: uuid.UUID = Field(
+        foreign_key="user.id", nullable=False, ondelete="CASCADE"
     )
     created_at: datetime | None = Field(
         default_factory=get_datetime_utc,
@@ -217,8 +217,8 @@ class ReviewUpdate(SQLModel):
 class Review(ReviewBase, table=True):
     id: int | None = Field(default=None, primary_key=True)
     book_id: int = Field(foreign_key="book.id", nullable=False, ondelete="CASCADE")
-    owner_id: uuid.UUID | None = Field(
-        default=None, foreign_key="user.id", nullable=True, ondelete="CASCADE"
+    owner_id: uuid.UUID = Field(
+        foreign_key="user.id", nullable=False, ondelete="CASCADE"
     )
     created_at: datetime | None = Field(
         default_factory=get_datetime_utc,
