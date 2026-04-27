@@ -18,8 +18,10 @@ import { Route as LayoutIndexRouteImport } from './routes/_layout/index'
 import { Route as LayoutSettingsRouteImport } from './routes/_layout/settings'
 import { Route as LayoutItemsRouteImport } from './routes/_layout/items'
 import { Route as LayoutAdminRouteImport } from './routes/_layout/admin'
+import { Route as LayoutReviewsIndexRouteImport } from './routes/_layout/reviews/index'
 import { Route as LayoutBooksIndexRouteImport } from './routes/_layout/books/index'
 import { Route as LayoutAuthorsIndexRouteImport } from './routes/_layout/authors/index'
+import { Route as LayoutReviewsCreateRouteImport } from './routes/_layout/reviews/create'
 import { Route as LayoutBooksCreateRouteImport } from './routes/_layout/books/create'
 import { Route as LayoutAuthorsCreateRouteImport } from './routes/_layout/authors/create'
 
@@ -67,6 +69,11 @@ const LayoutAdminRoute = LayoutAdminRouteImport.update({
   path: '/admin',
   getParentRoute: () => LayoutRoute,
 } as any)
+const LayoutReviewsIndexRoute = LayoutReviewsIndexRouteImport.update({
+  id: '/reviews/',
+  path: '/reviews/',
+  getParentRoute: () => LayoutRoute,
+} as any)
 const LayoutBooksIndexRoute = LayoutBooksIndexRouteImport.update({
   id: '/books/',
   path: '/books/',
@@ -75,6 +82,11 @@ const LayoutBooksIndexRoute = LayoutBooksIndexRouteImport.update({
 const LayoutAuthorsIndexRoute = LayoutAuthorsIndexRouteImport.update({
   id: '/authors/',
   path: '/authors/',
+  getParentRoute: () => LayoutRoute,
+} as any)
+const LayoutReviewsCreateRoute = LayoutReviewsCreateRouteImport.update({
+  id: '/reviews/create',
+  path: '/reviews/create',
   getParentRoute: () => LayoutRoute,
 } as any)
 const LayoutBooksCreateRoute = LayoutBooksCreateRouteImport.update({
@@ -99,8 +111,10 @@ export interface FileRoutesByFullPath {
   '/settings': typeof LayoutSettingsRoute
   '/authors/create': typeof LayoutAuthorsCreateRoute
   '/books/create': typeof LayoutBooksCreateRoute
+  '/reviews/create': typeof LayoutReviewsCreateRoute
   '/authors/': typeof LayoutAuthorsIndexRoute
   '/books/': typeof LayoutBooksIndexRoute
+  '/reviews/': typeof LayoutReviewsIndexRoute
 }
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
@@ -113,8 +127,10 @@ export interface FileRoutesByTo {
   '/': typeof LayoutIndexRoute
   '/authors/create': typeof LayoutAuthorsCreateRoute
   '/books/create': typeof LayoutBooksCreateRoute
+  '/reviews/create': typeof LayoutReviewsCreateRoute
   '/authors': typeof LayoutAuthorsIndexRoute
   '/books': typeof LayoutBooksIndexRoute
+  '/reviews': typeof LayoutReviewsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -129,8 +145,10 @@ export interface FileRoutesById {
   '/_layout/': typeof LayoutIndexRoute
   '/_layout/authors/create': typeof LayoutAuthorsCreateRoute
   '/_layout/books/create': typeof LayoutBooksCreateRoute
+  '/_layout/reviews/create': typeof LayoutReviewsCreateRoute
   '/_layout/authors/': typeof LayoutAuthorsIndexRoute
   '/_layout/books/': typeof LayoutBooksIndexRoute
+  '/_layout/reviews/': typeof LayoutReviewsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -145,8 +163,10 @@ export interface FileRouteTypes {
     | '/settings'
     | '/authors/create'
     | '/books/create'
+    | '/reviews/create'
     | '/authors/'
     | '/books/'
+    | '/reviews/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/login'
@@ -159,8 +179,10 @@ export interface FileRouteTypes {
     | '/'
     | '/authors/create'
     | '/books/create'
+    | '/reviews/create'
     | '/authors'
     | '/books'
+    | '/reviews'
   id:
     | '__root__'
     | '/_layout'
@@ -174,8 +196,10 @@ export interface FileRouteTypes {
     | '/_layout/'
     | '/_layout/authors/create'
     | '/_layout/books/create'
+    | '/_layout/reviews/create'
     | '/_layout/authors/'
     | '/_layout/books/'
+    | '/_layout/reviews/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -251,6 +275,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LayoutAdminRouteImport
       parentRoute: typeof LayoutRoute
     }
+    '/_layout/reviews/': {
+      id: '/_layout/reviews/'
+      path: '/reviews'
+      fullPath: '/reviews/'
+      preLoaderRoute: typeof LayoutReviewsIndexRouteImport
+      parentRoute: typeof LayoutRoute
+    }
     '/_layout/books/': {
       id: '/_layout/books/'
       path: '/books'
@@ -263,6 +294,13 @@ declare module '@tanstack/react-router' {
       path: '/authors'
       fullPath: '/authors/'
       preLoaderRoute: typeof LayoutAuthorsIndexRouteImport
+      parentRoute: typeof LayoutRoute
+    }
+    '/_layout/reviews/create': {
+      id: '/_layout/reviews/create'
+      path: '/reviews/create'
+      fullPath: '/reviews/create'
+      preLoaderRoute: typeof LayoutReviewsCreateRouteImport
       parentRoute: typeof LayoutRoute
     }
     '/_layout/books/create': {
@@ -289,8 +327,10 @@ interface LayoutRouteChildren {
   LayoutIndexRoute: typeof LayoutIndexRoute
   LayoutAuthorsCreateRoute: typeof LayoutAuthorsCreateRoute
   LayoutBooksCreateRoute: typeof LayoutBooksCreateRoute
+  LayoutReviewsCreateRoute: typeof LayoutReviewsCreateRoute
   LayoutAuthorsIndexRoute: typeof LayoutAuthorsIndexRoute
   LayoutBooksIndexRoute: typeof LayoutBooksIndexRoute
+  LayoutReviewsIndexRoute: typeof LayoutReviewsIndexRoute
 }
 
 const LayoutRouteChildren: LayoutRouteChildren = {
@@ -300,8 +340,10 @@ const LayoutRouteChildren: LayoutRouteChildren = {
   LayoutIndexRoute: LayoutIndexRoute,
   LayoutAuthorsCreateRoute: LayoutAuthorsCreateRoute,
   LayoutBooksCreateRoute: LayoutBooksCreateRoute,
+  LayoutReviewsCreateRoute: LayoutReviewsCreateRoute,
   LayoutAuthorsIndexRoute: LayoutAuthorsIndexRoute,
   LayoutBooksIndexRoute: LayoutBooksIndexRoute,
+  LayoutReviewsIndexRoute: LayoutReviewsIndexRoute,
 }
 
 const LayoutRouteWithChildren =

@@ -1,4 +1,4 @@
-import { BookUser, Briefcase, Users } from "lucide-react"
+import { BookUser, Briefcase, MessageSquare, Users } from "lucide-react"
 import {
   Sidebar,
   SidebarContent,
@@ -24,6 +24,15 @@ const baseItems: Item[] = [
     children: [
       { title: "List", path: "/books" },
       { title: "Create", path: "/books/create" },
+    ],
+  },
+  {
+    icon: MessageSquare,
+    title: "Reviews",
+    path: "/reviews",
+    children: [
+      { title: "List", path: "/reviews" },
+      { title: "Create", path: "/reviews/create" },
     ],
   },
 ]

@@ -138,6 +138,24 @@ def test_read_books_scoped_for_normal_user(
         assert item["owner_id"] == current_user_id
 
 
+def test_read_books_sorted_old_to_new(
+    client: TestClient, normal_user_token_headers: dict[str, str], db: Session
+) -> None:
+    current_user_id = _get_current_user_id(client, normal_user_token_headers)
+    first = create_random_book(db, owner_id=current_user_id)
+    second = create_random_book(db, owner_id=current_user_id)
+    third = create_random_book(db, owner_id=current_user_id)
+
+    response = client.get(
+        f"{settings.API_V1_STR}/books/",
+        headers=normal_user_token_headers,
+        params={"page": 1, "page_size": 100},
+    )
+    assert response.status_code == 200
+    ids = [item["id"] for item in response.json()["data"]]
+    assert ids.index(first.id) < ids.index(second.id) < ids.index(third.id)
+
+
 def test_update_book(
     client: TestClient, normal_user_token_headers: dict[str, str], db: Session
 ) -> None:

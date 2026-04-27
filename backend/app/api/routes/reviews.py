@@ -56,7 +56,7 @@ def read_reviews(
         count_statement = count_statement.where(Review.owner_id == _current_user.id)
     count = session.exec(count_statement).one()
     skip, total_pages = get_pagination(page=page, page_size=page_size, total=count)
-    statement = select(Review).order_by(col(Review.created_at).desc())
+    statement = select(Review).order_by(col(Review.created_at).asc())
     if not _current_user.is_superuser:
         statement = statement.where(Review.owner_id == _current_user.id)
     statement = statement.offset(skip).limit(page_size)
