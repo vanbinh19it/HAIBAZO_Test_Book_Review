@@ -3,7 +3,229 @@
 import type { CancelablePromise } from './core/CancelablePromise';
 import { OpenAPI } from './core/OpenAPI';
 import { request as __request } from './core/request';
-import type { ItemsReadItemsData, ItemsReadItemsResponse, ItemsCreateItemData, ItemsCreateItemResponse, ItemsReadItemData, ItemsReadItemResponse, ItemsUpdateItemData, ItemsUpdateItemResponse, ItemsDeleteItemData, ItemsDeleteItemResponse, LoginLoginAccessTokenData, LoginLoginAccessTokenResponse, LoginTestTokenResponse, LoginRecoverPasswordData, LoginRecoverPasswordResponse, LoginResetPasswordData, LoginResetPasswordResponse, LoginRecoverPasswordHtmlContentData, LoginRecoverPasswordHtmlContentResponse, PrivateCreateUserData, PrivateCreateUserResponse, UsersReadUsersData, UsersReadUsersResponse, UsersCreateUserData, UsersCreateUserResponse, UsersReadUserMeResponse, UsersDeleteUserMeResponse, UsersUpdateUserMeData, UsersUpdateUserMeResponse, UsersUpdatePasswordMeData, UsersUpdatePasswordMeResponse, UsersRegisterUserData, UsersRegisterUserResponse, UsersReadUserByIdData, UsersReadUserByIdResponse, UsersUpdateUserData, UsersUpdateUserResponse, UsersDeleteUserData, UsersDeleteUserResponse, UtilsTestEmailData, UtilsTestEmailResponse, UtilsHealthCheckResponse } from './types.gen';
+import type { AuthorsReadAuthorsData, AuthorsReadAuthorsResponse, AuthorsCreateAuthorData, AuthorsCreateAuthorResponse, AuthorsReadAuthorData, AuthorsReadAuthorResponse, AuthorsUpdateAuthorData, AuthorsUpdateAuthorResponse, AuthorsDeleteAuthorData, AuthorsDeleteAuthorResponse, BooksReadBooksData, BooksReadBooksResponse, BooksCreateBookData, BooksCreateBookResponse, BooksReadBookData, BooksReadBookResponse, BooksUpdateBookData, BooksUpdateBookResponse, BooksDeleteBookData, BooksDeleteBookResponse, ItemsReadItemsData, ItemsReadItemsResponse, ItemsCreateItemData, ItemsCreateItemResponse, ItemsReadItemData, ItemsReadItemResponse, ItemsUpdateItemData, ItemsUpdateItemResponse, ItemsDeleteItemData, ItemsDeleteItemResponse, LoginLoginAccessTokenData, LoginLoginAccessTokenResponse, LoginTestTokenResponse, LoginRecoverPasswordData, LoginRecoverPasswordResponse, LoginResetPasswordData, LoginResetPasswordResponse, LoginRecoverPasswordHtmlContentData, LoginRecoverPasswordHtmlContentResponse, PrivateCreateUserData, PrivateCreateUserResponse, ReviewsReadReviewsData, ReviewsReadReviewsResponse, ReviewsCreateReviewData, ReviewsCreateReviewResponse, ReviewsReadReviewData, ReviewsReadReviewResponse, ReviewsUpdateReviewData, ReviewsUpdateReviewResponse, ReviewsDeleteReviewData, ReviewsDeleteReviewResponse, UsersReadUsersData, UsersReadUsersResponse, UsersCreateUserData, UsersCreateUserResponse, UsersReadUserMeResponse, UsersDeleteUserMeResponse, UsersUpdateUserMeData, UsersUpdateUserMeResponse, UsersUpdatePasswordMeData, UsersUpdatePasswordMeResponse, UsersRegisterUserData, UsersRegisterUserResponse, UsersReadUserByIdData, UsersReadUserByIdResponse, UsersUpdateUserData, UsersUpdateUserResponse, UsersDeleteUserData, UsersDeleteUserResponse, UtilsTestEmailData, UtilsTestEmailResponse, UtilsHealthCheckResponse } from './types.gen';
+
+export class AuthorsService {
+    /**
+     * Read Authors
+     * Retrieve authors.
+     * @param data The data for the request.
+     * @param data.page
+     * @param data.pageSize
+     * @returns AuthorsPublic Successful Response
+     * @throws ApiError
+     */
+    public static readAuthors(data: AuthorsReadAuthorsData = {}): CancelablePromise<AuthorsReadAuthorsResponse> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/v1/authors/',
+            query: {
+                page: data.page,
+                page_size: data.pageSize
+            },
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+    
+    /**
+     * Create Author
+     * Create new author.
+     * @param data The data for the request.
+     * @param data.requestBody
+     * @returns AuthorPublic Successful Response
+     * @throws ApiError
+     */
+    public static createAuthor(data: AuthorsCreateAuthorData): CancelablePromise<AuthorsCreateAuthorResponse> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/api/v1/authors/',
+            body: data.requestBody,
+            mediaType: 'application/json',
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+    
+    /**
+     * Read Author
+     * Get author by ID.
+     * @param data The data for the request.
+     * @param data.id
+     * @returns AuthorPublic Successful Response
+     * @throws ApiError
+     */
+    public static readAuthor(data: AuthorsReadAuthorData): CancelablePromise<AuthorsReadAuthorResponse> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/v1/authors/{id}',
+            path: {
+                id: data.id
+            },
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+    
+    /**
+     * Update Author
+     * Update an author.
+     * @param data The data for the request.
+     * @param data.id
+     * @param data.requestBody
+     * @returns AuthorPublic Successful Response
+     * @throws ApiError
+     */
+    public static updateAuthor(data: AuthorsUpdateAuthorData): CancelablePromise<AuthorsUpdateAuthorResponse> {
+        return __request(OpenAPI, {
+            method: 'PUT',
+            url: '/api/v1/authors/{id}',
+            path: {
+                id: data.id
+            },
+            body: data.requestBody,
+            mediaType: 'application/json',
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+    
+    /**
+     * Delete Author
+     * Delete an author.
+     * @param data The data for the request.
+     * @param data.id
+     * @returns Message Successful Response
+     * @throws ApiError
+     */
+    public static deleteAuthor(data: AuthorsDeleteAuthorData): CancelablePromise<AuthorsDeleteAuthorResponse> {
+        return __request(OpenAPI, {
+            method: 'DELETE',
+            url: '/api/v1/authors/{id}',
+            path: {
+                id: data.id
+            },
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+}
+
+export class BooksService {
+    /**
+     * Read Books
+     * Retrieve books.
+     * @param data The data for the request.
+     * @param data.page
+     * @param data.pageSize
+     * @returns BooksPublic Successful Response
+     * @throws ApiError
+     */
+    public static readBooks(data: BooksReadBooksData = {}): CancelablePromise<BooksReadBooksResponse> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/v1/books/',
+            query: {
+                page: data.page,
+                page_size: data.pageSize
+            },
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+    
+    /**
+     * Create Book
+     * Create new book.
+     * @param data The data for the request.
+     * @param data.requestBody
+     * @returns BookPublic Successful Response
+     * @throws ApiError
+     */
+    public static createBook(data: BooksCreateBookData): CancelablePromise<BooksCreateBookResponse> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/api/v1/books/',
+            body: data.requestBody,
+            mediaType: 'application/json',
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+    
+    /**
+     * Read Book
+     * Get book by ID.
+     * @param data The data for the request.
+     * @param data.id
+     * @returns BookPublic Successful Response
+     * @throws ApiError
+     */
+    public static readBook(data: BooksReadBookData): CancelablePromise<BooksReadBookResponse> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/v1/books/{id}',
+            path: {
+                id: data.id
+            },
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+    
+    /**
+     * Update Book
+     * Update a book.
+     * @param data The data for the request.
+     * @param data.id
+     * @param data.requestBody
+     * @returns BookPublic Successful Response
+     * @throws ApiError
+     */
+    public static updateBook(data: BooksUpdateBookData): CancelablePromise<BooksUpdateBookResponse> {
+        return __request(OpenAPI, {
+            method: 'PUT',
+            url: '/api/v1/books/{id}',
+            path: {
+                id: data.id
+            },
+            body: data.requestBody,
+            mediaType: 'application/json',
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+    
+    /**
+     * Delete Book
+     * Delete a book.
+     * @param data The data for the request.
+     * @param data.id
+     * @returns Message Successful Response
+     * @throws ApiError
+     */
+    public static deleteBook(data: BooksDeleteBookData): CancelablePromise<BooksDeleteBookResponse> {
+        return __request(OpenAPI, {
+            method: 'DELETE',
+            url: '/api/v1/books/{id}',
+            path: {
+                id: data.id
+            },
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+}
 
 export class ItemsService {
     /**
@@ -228,6 +450,117 @@ export class PrivateService {
             url: '/api/v1/private/users/',
             body: data.requestBody,
             mediaType: 'application/json',
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+}
+
+export class ReviewsService {
+    /**
+     * Read Reviews
+     * Retrieve reviews.
+     * @param data The data for the request.
+     * @param data.page
+     * @param data.pageSize
+     * @returns ReviewsPublic Successful Response
+     * @throws ApiError
+     */
+    public static readReviews(data: ReviewsReadReviewsData = {}): CancelablePromise<ReviewsReadReviewsResponse> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/v1/reviews/',
+            query: {
+                page: data.page,
+                page_size: data.pageSize
+            },
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+    
+    /**
+     * Create Review
+     * Create new review.
+     * @param data The data for the request.
+     * @param data.requestBody
+     * @returns ReviewPublic Successful Response
+     * @throws ApiError
+     */
+    public static createReview(data: ReviewsCreateReviewData): CancelablePromise<ReviewsCreateReviewResponse> {
+        return __request(OpenAPI, {
+            method: 'POST',
+            url: '/api/v1/reviews/',
+            body: data.requestBody,
+            mediaType: 'application/json',
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+    
+    /**
+     * Read Review
+     * Get review by ID.
+     * @param data The data for the request.
+     * @param data.id
+     * @returns ReviewPublic Successful Response
+     * @throws ApiError
+     */
+    public static readReview(data: ReviewsReadReviewData): CancelablePromise<ReviewsReadReviewResponse> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/v1/reviews/{id}',
+            path: {
+                id: data.id
+            },
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+    
+    /**
+     * Update Review
+     * Update a review.
+     * @param data The data for the request.
+     * @param data.id
+     * @param data.requestBody
+     * @returns ReviewPublic Successful Response
+     * @throws ApiError
+     */
+    public static updateReview(data: ReviewsUpdateReviewData): CancelablePromise<ReviewsUpdateReviewResponse> {
+        return __request(OpenAPI, {
+            method: 'PUT',
+            url: '/api/v1/reviews/{id}',
+            path: {
+                id: data.id
+            },
+            body: data.requestBody,
+            mediaType: 'application/json',
+            errors: {
+                422: 'Validation Error'
+            }
+        });
+    }
+    
+    /**
+     * Delete Review
+     * Delete a review.
+     * @param data The data for the request.
+     * @param data.id
+     * @returns Message Successful Response
+     * @throws ApiError
+     */
+    public static deleteReview(data: ReviewsDeleteReviewData): CancelablePromise<ReviewsDeleteReviewResponse> {
+        return __request(OpenAPI, {
+            method: 'DELETE',
+            url: '/api/v1/reviews/{id}',
+            path: {
+                id: data.id
+            },
             errors: {
                 422: 'Validation Error'
             }
