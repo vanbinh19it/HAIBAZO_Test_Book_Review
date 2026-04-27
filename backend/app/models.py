@@ -2,7 +2,7 @@ import uuid
 from datetime import datetime, timezone
 
 from pydantic import EmailStr
-from sqlalchemy import DateTime
+from sqlalchemy import DateTime, UniqueConstraint
 from sqlmodel import Field, Relationship, SQLModel
 
 
@@ -122,7 +122,12 @@ class AuthorUpdate(SQLModel):
 
 
 class Author(AuthorBase, table=True):
+    __table_args__ = (UniqueConstraint("name", "owner_id", name="uq_author_name_owner"),)
+
     id: int | None = Field(default=None, primary_key=True)
+    owner_id: uuid.UUID | None = Field(
+        default=None, foreign_key="user.id", nullable=True, ondelete="CASCADE"
+    )
     created_at: datetime | None = Field(
         default_factory=get_datetime_utc,
         sa_type=DateTime(timezone=True),  # type: ignore
@@ -132,6 +137,7 @@ class Author(AuthorBase, table=True):
 
 class AuthorPublic(AuthorBase):
     id: int
+    owner_id: uuid.UUID | None = None
     books_count: int | None = None
     created_at: datetime | None = None
 
@@ -160,8 +166,15 @@ class BookUpdate(SQLModel):
 
 
 class Book(BookBase, table=True):
+    __table_args__ = (
+        UniqueConstraint("title", "author_id", "owner_id", name="uq_book_title_author_owner"),
+    )
+
     id: int | None = Field(default=None, primary_key=True)
     author_id: int = Field(foreign_key="author.id", nullable=False, ondelete="CASCADE")
+    owner_id: uuid.UUID | None = Field(
+        default=None, foreign_key="user.id", nullable=True, ondelete="CASCADE"
+    )
     created_at: datetime | None = Field(
         default_factory=get_datetime_utc,
         sa_type=DateTime(timezone=True),  # type: ignore
@@ -173,12 +186,18 @@ class Book(BookBase, table=True):
 class BookPublic(BookBase):
     id: int
     author_id: int
+    owner_id: uuid.UUID | None = None
+    author_name: str | None = None
     created_at: datetime | None = None
 
 
 class BooksPublic(SQLModel):
     data: list[BookPublic]
     count: int
+    page: int | None = None
+    limit: int | None = None
+    total: int | None = None
+    total_pages: int | None = None
 
 
 # Shared properties
@@ -198,6 +217,9 @@ class ReviewUpdate(SQLModel):
 class Review(ReviewBase, table=True):
     id: int | None = Field(default=None, primary_key=True)
     book_id: int = Field(foreign_key="book.id", nullable=False, ondelete="CASCADE")
+    owner_id: uuid.UUID | None = Field(
+        default=None, foreign_key="user.id", nullable=True, ondelete="CASCADE"
+    )
     created_at: datetime | None = Field(
         default_factory=get_datetime_utc,
         sa_type=DateTime(timezone=True),  # type: ignore
@@ -208,12 +230,19 @@ class Review(ReviewBase, table=True):
 class ReviewPublic(ReviewBase):
     id: int
     book_id: int
+    owner_id: uuid.UUID | None = None
+    book_title: str | None = None
+    author_name: str | None = None
     created_at: datetime | None = None
 
 
 class ReviewsPublic(SQLModel):
     data: list[ReviewPublic]
     count: int
+    page: int | None = None
+    limit: int | None = None
+    total: int | None = None
+    total_pages: int | None = None
 
 
 # Generic message
