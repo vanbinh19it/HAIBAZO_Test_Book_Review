@@ -3,6 +3,7 @@ from typing import Any
 from fastapi import APIRouter, HTTPException, Query
 from sqlmodel import col, func, select
 
+from app.api.authz import ensure_owner_or_superuser
 from app.api.deps import CurrentUser, SessionDep
 from app.api.pagination import get_pagination
 from app.models import (
@@ -87,8 +88,10 @@ def read_book(session: SessionDep, _current_user: CurrentUser, id: int) -> Any:
     book = session.get(Book, id)
     if not book:
         raise HTTPException(status_code=404, detail="Book not found")
-    if not _current_user.is_superuser and (book.owner_id != _current_user.id):
-        raise HTTPException(status_code=403, detail="Not enough permissions")
+    ensure_owner_or_superuser(
+        current_user=_current_user,
+        entity_owner_id=book.owner_id,
+    )
 
     author = session.get(Author, book.author_id)
     return to_book_public(book=book, author_name=author.name if author else None)
@@ -102,8 +105,10 @@ def create_book(
     Create new book.
     """
     author = check_author_exists(session=session, author_id=book_in.author_id)
-    if not _current_user.is_superuser and (author.owner_id != _current_user.id):
-        raise HTTPException(status_code=403, detail="Not enough permissions")
+    ensure_owner_or_superuser(
+        current_user=_current_user,
+        entity_owner_id=author.owner_id,
+    )
 
     existing_book_statement = select(Book).where(
         Book.title == book_in.title,
@@ -119,7 +124,8 @@ def create_book(
             status_code=400, detail="Book already exists for this author"
         )
 
-    book = Book.model_validate(book_in, update={"owner_id": _current_user.id})
+    # Enforce ownership consistency with the selected author.
+    book = Book.model_validate(book_in, update={"owner_id": author.owner_id})
     session.add(book)
     session.commit()
     session.refresh(book)
@@ -140,16 +146,20 @@ def update_book(
     book = session.get(Book, id)
     if not book:
         raise HTTPException(status_code=404, detail="Book not found")
-    if not _current_user.is_superuser and (book.owner_id != _current_user.id):
-        raise HTTPException(status_code=403, detail="Not enough permissions")
+    ensure_owner_or_superuser(
+        current_user=_current_user,
+        entity_owner_id=book.owner_id,
+    )
 
     update_dict = book_in.model_dump(exclude_unset=True)
     target_author_id = update_dict.get("author_id", book.author_id)
     target_title = update_dict.get("title", book.title)
 
     author = check_author_exists(session=session, author_id=target_author_id)
-    if not _current_user.is_superuser and (author.owner_id != _current_user.id):
-        raise HTTPException(status_code=403, detail="Not enough permissions")
+    ensure_owner_or_superuser(
+        current_user=_current_user,
+        entity_owner_id=author.owner_id,
+    )
 
     existing_book_statement = select(Book).where(
         Book.title == target_title,
@@ -167,6 +177,8 @@ def update_book(
         )
 
     book.sqlmodel_update(update_dict)
+    # Keep owner aligned with parent author owner.
+    book.owner_id = author.owner_id
     session.add(book)
     session.commit()
     session.refresh(book)
@@ -181,8 +193,10 @@ def delete_book(session: SessionDep, _current_user: CurrentUser, id: int) -> Mes
     book = session.get(Book, id)
     if not book:
         raise HTTPException(status_code=404, detail="Book not found")
-    if not _current_user.is_superuser and (book.owner_id != _current_user.id):
-        raise HTTPException(status_code=403, detail="Not enough permissions")
+    ensure_owner_or_superuser(
+        current_user=_current_user,
+        entity_owner_id=book.owner_id,
+    )
 
     session.delete(book)
     session.commit()

@@ -3,6 +3,7 @@ from typing import Any
 from fastapi import APIRouter, HTTPException, Query
 from sqlmodel import col, func, select
 
+from app.api.authz import ensure_owner_or_superuser
 from app.api.deps import CurrentUser, SessionDep
 from app.api.pagination import get_pagination
 from app.models import (
@@ -83,8 +84,10 @@ def read_author(session: SessionDep, _current_user: CurrentUser, id: int) -> Any
     author = session.get(Author, id)
     if not author:
         raise HTTPException(status_code=404, detail="Author not found")
-    if not _current_user.is_superuser and (author.owner_id != _current_user.id):
-        raise HTTPException(status_code=403, detail="Not enough permissions")
+    ensure_owner_or_superuser(
+        current_user=_current_user,
+        entity_owner_id=author.owner_id,
+    )
     count_statement = select(func.count()).select_from(Book).where(Book.author_id == id)
     books_count = session.exec(count_statement).one()
     return to_author_public(author=author, books_count=books_count)
@@ -128,8 +131,10 @@ def update_author(
     author = session.get(Author, id)
     if not author:
         raise HTTPException(status_code=404, detail="Author not found")
-    if not _current_user.is_superuser and (author.owner_id != _current_user.id):
-        raise HTTPException(status_code=403, detail="Not enough permissions")
+    ensure_owner_or_superuser(
+        current_user=_current_user,
+        entity_owner_id=author.owner_id,
+    )
 
     update_dict = author_in.model_dump(exclude_unset=True)
     if "name" in update_dict:
@@ -161,8 +166,10 @@ def delete_author(session: SessionDep, _current_user: CurrentUser, id: int) -> M
     author = session.get(Author, id)
     if not author:
         raise HTTPException(status_code=404, detail="Author not found")
-    if not _current_user.is_superuser and (author.owner_id != _current_user.id):
-        raise HTTPException(status_code=403, detail="Not enough permissions")
+    ensure_owner_or_superuser(
+        current_user=_current_user,
+        entity_owner_id=author.owner_id,
+    )
 
     session.delete(author)
     session.commit()

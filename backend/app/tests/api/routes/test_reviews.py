@@ -182,3 +182,51 @@ def test_delete_review_not_enough_permissions(
     )
     assert response.status_code == 403
     assert response.json()["detail"] == "Not enough permissions"
+
+
+def test_superuser_create_review_owner_follows_book_owner(
+    client: TestClient, superuser_token_headers: dict[str, str], db: Session
+) -> None:
+    owner_headers = authentication_token_from_email(
+        client=client, email=random_email(), db=db
+    )
+    owner_id = _get_current_user_id(client, owner_headers)
+    book = create_random_book(db, owner_id=owner_id)
+
+    data = {"book_id": book.id, "content": f"review-{random_lower_string()}"}
+    response = client.post(
+        f"{settings.API_V1_STR}/reviews/",
+        headers=superuser_token_headers,
+        json=data,
+    )
+    assert response.status_code == 200
+    content = response.json()
+    assert content["book_id"] == book.id
+    assert content["owner_id"] == owner_id
+
+
+def test_superuser_update_review_book_realigns_owner(
+    client: TestClient, superuser_token_headers: dict[str, str], db: Session
+) -> None:
+    first_owner_headers = authentication_token_from_email(
+        client=client, email=random_email(), db=db
+    )
+    first_owner_id = _get_current_user_id(client, first_owner_headers)
+    second_owner_headers = authentication_token_from_email(
+        client=client, email=random_email(), db=db
+    )
+    second_owner_id = _get_current_user_id(client, second_owner_headers)
+
+    book_a = create_random_book(db, owner_id=first_owner_id)
+    book_b = create_random_book(db, owner_id=second_owner_id)
+    review = create_random_review(db, owner_id=first_owner_id, book=book_a)
+
+    response = client.put(
+        f"{settings.API_V1_STR}/reviews/{review.id}",
+        headers=superuser_token_headers,
+        json={"book_id": book_b.id},
+    )
+    assert response.status_code == 200
+    content = response.json()
+    assert content["book_id"] == book_b.id
+    assert content["owner_id"] == second_owner_id
