@@ -19,16 +19,13 @@ export const Route = createFileRoute("/_layout")({
 
 function Layout() {
   return (
-    <SidebarProvider className="pt-16">
+    <SidebarProvider className="min-h-svh bg-background pt-16">
       <TopHeader />
       <AppSidebar />
-     
-      <SidebarInset>
-      {/* <header className="sticky top-0 z-10 flex h-16 shrink-0 items-center gap-2 border-b px-4">
-          <SidebarTrigger className="-ml-1 text-muted-foreground" />
-        </header> */}
-        <main className="flex-1 p-6 md:p-8">
-          <div className="mx-auto max-w-7xl">
+
+      <SidebarInset className="bg-background">
+        <main className="flex-1 p-8">
+          <div className="mx-auto flex w-full max-w-7xl flex-col gap-8">
             <Outlet />
           </div>
         </main>

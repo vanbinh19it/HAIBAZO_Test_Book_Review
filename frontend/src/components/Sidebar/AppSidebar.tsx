@@ -47,7 +47,7 @@ export function AppSidebar() {
   return (
     <Sidebar
       collapsible="icon"
-      className="top-16 h-[calc(100svh-4rem)] border-r border-zinc-200"
+      className="top-16 h-[calc(100svh-4rem)] border-r border-sidebar-border bg-sidebar"
     >
       <SidebarContent className="px-4 py-6 group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:items-center">
         <Main items={items} />

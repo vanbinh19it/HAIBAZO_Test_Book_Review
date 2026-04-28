@@ -5,6 +5,7 @@ import { Search } from "lucide-react"
 import { Suspense, useMemo, useState } from "react"
 
 import { AuthorsService, BooksService } from "@/client"
+import DashboardPageHeader from "@/components/Common/DashboardPageHeader"
 import { DataTable } from "@/components/Common/DataTable"
 import PendingBooks from "@/components/Pending/PendingBooks"
 import { getBookColumns } from "@/components/Books/columns"
@@ -97,11 +98,11 @@ function BooksListPage() {
   })
 
   return (
-    <div className="flex flex-col gap-5">
-      <div className="flex items-center justify-between">
-        <p className="text-sm text-muted-foreground">Books &gt; List</p>
-
-      </div>
+    <div className="flex flex-col gap-6">
+      <DashboardPageHeader
+        title="Books > List"
+        titleClassName="text-3xl text-foreground"
+      />
       <BooksTable pagination={pagination} onPaginationChange={setPagination} />
     </div>
   )

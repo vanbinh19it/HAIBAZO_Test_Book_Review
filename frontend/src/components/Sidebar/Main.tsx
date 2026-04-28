@@ -28,6 +28,12 @@ interface MainProps {
   items: Item[]
 }
 
+const sidebarMenuButtonClassName =
+  "rounded-lg px-3 py-2.5 text-[13px] font-medium text-sidebar-foreground data-[active=true]:bg-sidebar-accent data-[active=true]:text-sidebar-accent-foreground hover:bg-sidebar-accent [&>svg]:stroke-[1.5]"
+
+const sidebarMenuSubButtonClassName =
+  "rounded-lg text-[12px] text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground data-[active=true]:bg-sidebar-accent data-[active=true]:text-sidebar-accent-foreground"
+
 export function Main({ items }: MainProps) {
   const { isMobile, setOpenMobile } = useSidebar()
   const router = useRouterState()
@@ -86,6 +92,7 @@ export function Main({ items }: MainProps) {
                   <SidebarMenuButton
                     tooltip={item.title}
                     isActive={isActive}
+                    className={sidebarMenuButtonClassName}
                     onClick={() => toggleMenu(item.title)}
                   >
                     <item.icon />
@@ -100,6 +107,7 @@ export function Main({ items }: MainProps) {
                   <SidebarMenuButton
                     tooltip={item.title}
                     isActive={isActive}
+                    className={sidebarMenuButtonClassName}
                     asChild
                   >
                     <RouterLink to={item.path} onClick={handleMenuClick}>
@@ -115,6 +123,7 @@ export function Main({ items }: MainProps) {
                         <SidebarMenuSubButton
                           asChild
                           isActive={currentPath === child.path}
+                          className={sidebarMenuSubButtonClassName}
                         >
                           <RouterLink to={child.path} onClick={handleMenuClick}>
                             <span>{child.title}</span>

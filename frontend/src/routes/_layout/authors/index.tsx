@@ -6,6 +6,7 @@ import { Suspense, useState } from "react"
 
 import { AuthorsService } from "@/client"
 import { columns } from "@/components/Authors/columns"
+import DashboardPageHeader from "@/components/Common/DashboardPageHeader"
 import { DataTable } from "@/components/Common/DataTable"
 import PendingAuthors from "@/components/Pending/PendingAuthors"
 
@@ -89,7 +90,7 @@ function AuthorsListPage() {
 
   return (
     <div className="flex flex-col gap-5">
-      <p className="text-sm text-muted-foreground">Authors &gt; List</p>
+      <DashboardPageHeader title="Authors > List" />
       <AuthorsTable pagination={pagination} onPaginationChange={setPagination} />
     </div>
   )

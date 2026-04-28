@@ -5,6 +5,7 @@ import { Search } from "lucide-react"
 import { Suspense, useState } from "react"
 
 import { ReviewsService } from "@/client"
+import DashboardPageHeader from "@/components/Common/DashboardPageHeader"
 import { DataTable } from "@/components/Common/DataTable"
 import PendingReviews from "@/components/Pending/PendingReviews"
 import { reviewColumns } from "@/components/Reviews/columns"
@@ -89,10 +90,7 @@ function ReviewsListPage() {
 
   return (
     <div className="flex flex-col gap-5">
-      <div className="flex items-center justify-between">
-        <p className="text-sm text-muted-foreground">Reviews &gt; List</p>
-        
-      </div>
+      <DashboardPageHeader title="Reviews > List" />
       <ReviewsTable pagination={pagination} onPaginationChange={setPagination} />
     </div>
   )
