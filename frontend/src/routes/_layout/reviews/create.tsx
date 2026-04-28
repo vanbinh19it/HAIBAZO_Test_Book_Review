@@ -66,7 +66,7 @@ function CreateReviewPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <p className="text-sm text-muted-foreground">Reviews &gt; Create</p>
+      
       <CreateReview
         form={form}
         onSubmit={onSubmit}

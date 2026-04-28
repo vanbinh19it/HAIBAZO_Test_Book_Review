@@ -56,7 +56,7 @@ function CreateAuthorPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <p className="text-sm text-muted-foreground">Authors &gt; Create</p>
+     
       <CreateAuthor
         form={form}
         onSubmit={onSubmit}

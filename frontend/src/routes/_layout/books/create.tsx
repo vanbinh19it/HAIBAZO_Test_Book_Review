@@ -68,7 +68,7 @@ function CreateBookPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <p className="text-sm text-muted-foreground">Books &gt; Create</p>
+      
       <CreateBook
         form={form}
         onSubmit={onSubmit}
