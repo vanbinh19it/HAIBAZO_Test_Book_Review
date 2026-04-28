@@ -1,13 +1,12 @@
 import { useSuspenseQuery } from "@tanstack/react-query"
 import type { OnChangeFn, PaginationState } from "@tanstack/react-table"
-import { createFileRoute, Link } from "@tanstack/react-router"
+import { createFileRoute } from "@tanstack/react-router"
 import { Search } from "lucide-react"
 import { Suspense, useMemo, useState } from "react"
 
 import { AuthorsService, BooksService } from "@/client"
 import { DataTable } from "@/components/Common/DataTable"
 import PendingBooks from "@/components/Pending/PendingBooks"
-import { Button } from "@/components/ui/button"
 import { getBookColumns } from "@/components/Books/columns"
 
 function getBooksQueryOptions(page: number, pageSize: number) {
@@ -101,9 +100,7 @@ function BooksListPage() {
     <div className="flex flex-col gap-5">
       <div className="flex items-center justify-between">
         <p className="text-sm text-muted-foreground">Books &gt; List</p>
-        <Button asChild size="sm">
-          <Link to="/books/create">Create</Link>
-        </Button>
+
       </div>
       <BooksTable pagination={pagination} onPaginationChange={setPagination} />
     </div>

@@ -1,6 +1,7 @@
 from typing import Any
 
 from fastapi import APIRouter, HTTPException, Query
+from sqlalchemy.exc import IntegrityError
 from sqlmodel import col, func, select
 
 from app.api.authz import ensure_owner_or_superuser
@@ -18,6 +19,10 @@ from app.models import (
 )
 
 router = APIRouter(prefix="/reviews", tags=["reviews"])
+
+
+def normalize_review_content(content: str) -> str:
+    return content.strip()
 
 
 def check_book_exists(session: SessionDep, book_id: int) -> Book:
@@ -136,6 +141,10 @@ def create_review(
     """
     Create new review.
     """
+    normalized_content = normalize_review_content(review_in.content)
+    if not normalized_content:
+        raise HTTPException(status_code=422, detail="Review is required")
+
     book = check_book_exists(session=session, book_id=review_in.book_id)
     ensure_owner_or_superuser(
         current_user=_current_user,
@@ -144,9 +153,15 @@ def create_review(
     author = session.get(Author, book.author_id)
 
     # Enforce ownership consistency with parent book.
-    review = Review.model_validate(review_in, update={"owner_id": book.owner_id})
+    review = Review.model_validate(
+        review_in, update={"owner_id": book.owner_id, "content": normalized_content}
+    )
     session.add(review)
-    session.commit()
+    try:
+        session.commit()
+    except IntegrityError:
+        session.rollback()
+        raise HTTPException(status_code=400, detail="Invalid review data") from None
     session.refresh(review)
     return to_review_public(
         review=review,
@@ -175,6 +190,12 @@ def update_review(
     )
 
     update_dict = review_in.model_dump(exclude_unset=True)
+    if "content" in update_dict:
+        if update_dict["content"] is None:
+            raise HTTPException(status_code=422, detail="Review is required")
+        update_dict["content"] = normalize_review_content(update_dict["content"])
+        if not update_dict["content"]:
+            raise HTTPException(status_code=422, detail="Review is required")
     target_book_id = update_dict.get("book_id", review.book_id)
     book = check_book_exists(session=session, book_id=target_book_id)
     ensure_owner_or_superuser(
@@ -187,7 +208,11 @@ def update_review(
     # Keep owner aligned with parent book owner.
     review.owner_id = book.owner_id
     session.add(review)
-    session.commit()
+    try:
+        session.commit()
+    except IntegrityError:
+        session.rollback()
+        raise HTTPException(status_code=400, detail="Invalid review data") from None
     session.refresh(review)
     return to_review_public(
         review=review,

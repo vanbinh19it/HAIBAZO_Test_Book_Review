@@ -53,6 +53,43 @@ def test_create_book_duplicate_same_owner(
     assert second.json()["detail"] == "Book already exists for this author"
 
 
+def test_create_book_duplicate_after_normalize_title(
+    client: TestClient, normal_user_token_headers: dict[str, str], db: Session
+) -> None:
+    current_user_id = _get_current_user_id(client, normal_user_token_headers)
+    author = create_random_author(db, owner_id=current_user_id)
+    title = f"book-{random_lower_string()}"
+    first = client.post(
+        f"{settings.API_V1_STR}/books/",
+        headers=normal_user_token_headers,
+        json={"title": title, "author_id": author.id},
+    )
+    assert first.status_code == 200
+
+    second = client.post(
+        f"{settings.API_V1_STR}/books/",
+        headers=normal_user_token_headers,
+        json={"title": f"  {title}  ", "author_id": author.id},
+    )
+    assert second.status_code == 400
+    assert second.json()["detail"] == "Book already exists for this author"
+
+
+def test_create_book_trims_title(
+    client: TestClient, normal_user_token_headers: dict[str, str], db: Session
+) -> None:
+    current_user_id = _get_current_user_id(client, normal_user_token_headers)
+    author = create_random_author(db, owner_id=current_user_id)
+    raw_title = f"  book-{random_lower_string()}  "
+    response = client.post(
+        f"{settings.API_V1_STR}/books/",
+        headers=normal_user_token_headers,
+        json={"title": raw_title, "author_id": author.id},
+    )
+    assert response.status_code == 200
+    assert response.json()["title"] == raw_title.strip()
+
+
 def test_create_book_not_enough_permissions(
     client: TestClient, normal_user_token_headers: dict[str, str], db: Session
 ) -> None:
@@ -191,6 +228,20 @@ def test_update_book_not_enough_permissions(
     )
     assert response.status_code == 403
     assert response.json()["detail"] == "Not enough permissions"
+
+
+def test_update_book_title_none_returns_422(
+    client: TestClient, normal_user_token_headers: dict[str, str], db: Session
+) -> None:
+    current_user_id = _get_current_user_id(client, normal_user_token_headers)
+    book = create_random_book(db, owner_id=current_user_id)
+    response = client.put(
+        f"{settings.API_V1_STR}/books/{book.id}",
+        headers=normal_user_token_headers,
+        json={"title": None},
+    )
+    assert response.status_code == 422
+    assert response.json()["detail"] == "Title is required"
 
 
 def test_delete_book(

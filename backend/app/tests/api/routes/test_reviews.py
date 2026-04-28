@@ -33,6 +33,21 @@ def test_create_review(
     assert content["owner_id"] == current_user_id
 
 
+def test_create_review_trims_content(
+    client: TestClient, normal_user_token_headers: dict[str, str], db: Session
+) -> None:
+    current_user_id = _get_current_user_id(client, normal_user_token_headers)
+    book = create_random_book(db, owner_id=current_user_id)
+    raw_content = f"  review-{random_lower_string()}  "
+    response = client.post(
+        f"{settings.API_V1_STR}/reviews/",
+        headers=normal_user_token_headers,
+        json={"book_id": book.id, "content": raw_content},
+    )
+    assert response.status_code == 200
+    assert response.json()["content"] == raw_content.strip()
+
+
 def test_create_review_not_enough_permissions(
     client: TestClient, normal_user_token_headers: dict[str, str], db: Session
 ) -> None:
@@ -171,6 +186,20 @@ def test_update_review_not_enough_permissions(
     )
     assert response.status_code == 403
     assert response.json()["detail"] == "Not enough permissions"
+
+
+def test_update_review_content_none_returns_422(
+    client: TestClient, normal_user_token_headers: dict[str, str], db: Session
+) -> None:
+    current_user_id = _get_current_user_id(client, normal_user_token_headers)
+    review = create_random_review(db, owner_id=current_user_id)
+    response = client.put(
+        f"{settings.API_V1_STR}/reviews/{review.id}",
+        headers=normal_user_token_headers,
+        json={"content": None},
+    )
+    assert response.status_code == 422
+    assert response.json()["detail"] == "Review is required"
 
 
 def test_delete_review(

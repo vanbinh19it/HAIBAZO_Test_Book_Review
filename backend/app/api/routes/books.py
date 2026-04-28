@@ -1,6 +1,7 @@
 from typing import Any
 
 from fastapi import APIRouter, HTTPException, Query
+from sqlalchemy.exc import IntegrityError
 from sqlmodel import col, func, select
 
 from app.api.authz import ensure_owner_or_superuser
@@ -19,7 +20,11 @@ from app.models import (
 router = APIRouter(prefix="/books", tags=["books"])
 
 
-def check_author_exists(session: SessionDep, author_id: int) -> Author | None:
+def normalize_book_title(title: str) -> str:
+    return title.strip()
+
+
+def check_author_exists(session: SessionDep, author_id: int) -> Author:
     author = session.get(Author, author_id)
     if not author:
         raise HTTPException(status_code=404, detail="Author not found")
@@ -104,6 +109,10 @@ def create_book(
     """
     Create new book.
     """
+    normalized_title = normalize_book_title(book_in.title)
+    if not normalized_title:
+        raise HTTPException(status_code=422, detail="Title is required")
+
     author = check_author_exists(session=session, author_id=book_in.author_id)
     ensure_owner_or_superuser(
         current_user=_current_user,
@@ -111,7 +120,7 @@ def create_book(
     )
 
     existing_book_statement = select(Book).where(
-        Book.title == book_in.title,
+        Book.title == normalized_title,
         Book.author_id == book_in.author_id,
     )
     if not _current_user.is_superuser:
@@ -125,9 +134,17 @@ def create_book(
         )
 
     # Enforce ownership consistency with the selected author.
-    book = Book.model_validate(book_in, update={"owner_id": author.owner_id})
+    book = Book.model_validate(
+        book_in, update={"owner_id": author.owner_id, "title": normalized_title}
+    )
     session.add(book)
-    session.commit()
+    try:
+        session.commit()
+    except IntegrityError:
+        session.rollback()
+        raise HTTPException(
+            status_code=400, detail="Book already exists for this author"
+        ) from None
     session.refresh(book)
     return to_book_public(book=book, author_name=author.name)
 
@@ -152,6 +169,12 @@ def update_book(
     )
 
     update_dict = book_in.model_dump(exclude_unset=True)
+    if "title" in update_dict:
+        if update_dict["title"] is None:
+            raise HTTPException(status_code=422, detail="Title is required")
+        update_dict["title"] = normalize_book_title(update_dict["title"])
+        if not update_dict["title"]:
+            raise HTTPException(status_code=422, detail="Title is required")
     target_author_id = update_dict.get("author_id", book.author_id)
     target_title = update_dict.get("title", book.title)
 
@@ -180,7 +203,13 @@ def update_book(
     # Keep owner aligned with parent author owner.
     book.owner_id = author.owner_id
     session.add(book)
-    session.commit()
+    try:
+        session.commit()
+    except IntegrityError:
+        session.rollback()
+        raise HTTPException(
+            status_code=400, detail="Book already exists for this author"
+        ) from None
     session.refresh(book)
     return to_book_public(book=book, author_name=author.name)
 
