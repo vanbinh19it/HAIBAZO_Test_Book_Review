@@ -18,8 +18,11 @@ OpenAPI.TOKEN = async () => {
   return localStorage.getItem("access_token") || ""
 }
 
-// Keep admin UI in dark mode by default.
-localStorage.setItem("vite-ui-theme", "dark")
+// Migrate old dark preference to light so UI updates immediately.
+const savedTheme = localStorage.getItem("vite-ui-theme")
+if (savedTheme === "dark") {
+  localStorage.setItem("vite-ui-theme", "light")
+}
 
 const redirectToLogin = () => {
   localStorage.removeItem("access_token")
@@ -59,7 +62,7 @@ declare module "@tanstack/react-router" {
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+    <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
       <QueryClientProvider client={queryClient}>
         <RouterProvider router={router} />
         <Toaster richColors closeButton />
