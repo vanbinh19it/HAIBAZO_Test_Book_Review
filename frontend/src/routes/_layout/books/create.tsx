@@ -13,7 +13,10 @@ import { handleError } from "@/utils"
 
 const formSchema = z.object({
   title: z.string().trim().min(1, { message: "Title is required" }),
-  author_id: z.number({ message: "Author is required" }).int().positive(),
+  author_id: z
+    .number({ message: "Author is required" })
+    .int()
+    .positive({ message: "Author is required" }),
 })
 
 function getAuthorsQueryOptions() {
