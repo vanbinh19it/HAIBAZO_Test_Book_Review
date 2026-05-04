@@ -36,29 +36,10 @@ export default function CreateReview({
   isSubmitting,
   books,
 }: CreateReviewProps) {
-  const handleInvalidSubmit = () => {
-    const currentBookId = form.getValues("book_id")
-    const currentContent = form.getValues("content")
-
-    if (!currentBookId || currentBookId <= 0) {
-      form.setError("book_id", {
-        type: "manual",
-        message: "Please select book",
-      })
-    }
-
-    if (!currentContent?.trim()) {
-      form.setError("content", {
-        type: "manual",
-        message: "Please enter review",
-      })
-    }
-  }
-
   return (
     <Form {...form}>
       <form
-        onSubmit={form.handleSubmit(onSubmit, handleInvalidSubmit)}
+        onSubmit={form.handleSubmit(onSubmit)}
         className="w-full space-y-6 md:w-1/2"
       >
         <FormField
