@@ -59,6 +59,11 @@ export default function CreateReview({
                     <SelectValue placeholder="Select a book" />
                   </SelectTrigger>
                   <SelectContent>
+                    {books.length === 0 ? (
+                      <SelectItem value="__empty__" disabled>
+                        No books available
+                      </SelectItem>
+                    ) : null}
                     {books.map((book) => (
                       <SelectItem key={book.id} value={String(book.id)}>
                         {book.title}
