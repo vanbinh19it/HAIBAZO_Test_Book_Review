@@ -36,16 +36,35 @@ export default function CreateReview({
   isSubmitting,
   books,
 }: CreateReviewProps) {
+  const handleInvalidSubmit = () => {
+    const currentBookId = form.getValues("book_id")
+    const currentContent = form.getValues("content")
+
+    if (!currentBookId || currentBookId <= 0) {
+      form.setError("book_id", {
+        type: "manual",
+        message: "Please select book",
+      })
+    }
+
+    if (!currentContent?.trim()) {
+      form.setError("content", {
+        type: "manual",
+        message: "Please enter review",
+      })
+    }
+  }
+
   return (
     <Form {...form}>
       <form
-        onSubmit={form.handleSubmit(onSubmit)}
+        onSubmit={form.handleSubmit(onSubmit, handleInvalidSubmit)}
         className="w-full space-y-6 md:w-1/2"
       >
         <FormField
           control={form.control}
           name="book_id"
-          render={({ field, fieldState }) => (
+          render={({ field }) => (
             <FormItem>
               <FormLabel>
                 Book <span className="text-destructive">*</span>
@@ -73,11 +92,6 @@ export default function CreateReview({
                 </Select>
               </FormControl>
               <FormMessage />
-              {form.formState.submitCount > 0 &&
-              (!field.value || field.value <= 0) &&
-              !fieldState.error ? (
-                <p className="text-destructive text-sm">Please select book</p>
-              ) : null}
             </FormItem>
           )}
         />
