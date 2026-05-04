@@ -12,8 +12,8 @@ import useCustomToast from "@/hooks/useCustomToast"
 import { handleError } from "@/utils"
 
 const formSchema = z.object({
-  book_id: z.number({ message: "Book is required" }).int().positive(),
-  content: z.string().trim().min(1, { message: "Review is required" }),
+  book_id: z.number({ message: "Please select  book" }).int().positive(),
+  content: z.string().trim().min(1, { message: "Please enter review" }),
 })
 
 function getBooksQueryOptions() {

@@ -12,7 +12,7 @@ import useCustomToast from "@/hooks/useCustomToast"
 import { handleError } from "@/utils"
 
 const formSchema = z.object({
-  name: z.string().trim().min(1, { message: "Name is required" }),
+  name: z.string().trim().min(1, { message: "Please enter name" }),
 })
 
 export const Route = createFileRoute("/_layout/authors/create")({
