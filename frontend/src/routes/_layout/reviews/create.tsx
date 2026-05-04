@@ -12,7 +12,11 @@ import useCustomToast from "@/hooks/useCustomToast"
 import { handleError } from "@/utils"
 
 const formSchema = z.object({
-  book_id: z.number({ message: "Please select  book" }).int().positive(),
+  book_id: z
+    .number()
+    .refine((value) => Number.isInteger(value) && value > 0, {
+      message: "Please select book",
+    }),
   content: z.string().trim().min(1, { message: "Please enter review" }),
 })
 
