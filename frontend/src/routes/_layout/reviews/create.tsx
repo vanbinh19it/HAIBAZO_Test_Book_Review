@@ -11,19 +11,13 @@ import CreateReview, {
 import useCustomToast from "@/hooks/useCustomToast"
 import { handleError } from "@/utils"
 
-// Explanation:
-// The issue is related to validation mode in react-hook-form. With 'onBlur' mode, validation messages will only appear for each field *after* it has been blurred (touched and left). 
-// This means if you immediately submit the form with both fields empty, only *one* field's error shows up, usually the first one, not both at once.
-// To show all validation error messages for all fields simultaneously when the user submits (even untouched fields), you should switch the form mode to "onTouched" or "onSubmit", and set `shouldFocusError: false` to avoid auto-focusing and only show all messages.
-
 const formSchema = z.object({
-  book_id: z
-    .number()
-    .refine((value) => Number.isInteger(value) && value > 0, {
-      message: "Please select book",
-    }),
+  book_id: z.coerce
+    .number<number>()
+    .int()
+    .positive({ message: "Please select book" }),
   content: z.string().trim().min(1, { message: "Please enter review" }),
-})
+}) satisfies z.ZodType<CreateReviewFormData>
 
 function getBooksQueryOptions() {
   return {

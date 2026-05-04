@@ -13,12 +13,11 @@ import { handleError } from "@/utils"
 
 const formSchema = z.object({
   title: z.string().trim().min(1, { message: "Please enter name" }),
-  author_id: z
-    .number()
-    .refine((value) => Number.isInteger(value) && value > 0, {
-      message: "Please select author",
-    }),
-})
+  author_id: z.coerce
+    .number<number>()
+    .int()
+    .positive({ message: "Please select author" }),
+}) satisfies z.ZodType<CreateBookFormData>
 
 function getAuthorsQueryOptions() {
   return {
