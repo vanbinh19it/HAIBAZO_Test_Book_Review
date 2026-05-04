@@ -7,8 +7,8 @@
 ## Kết quả:
 ### Frontend: https://haibazo-test-book-review-frontend.vercel.app/
 ### Backend: https://haibazo-test-book-review.onrender.com/
-**admin**: admin@example.com
-**password**: admin@123
+- **admin**: admin@example.com
+- **password**: admin@123
 
 ## Tính năng đã triển khai
 
