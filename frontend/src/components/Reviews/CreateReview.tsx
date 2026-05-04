@@ -45,7 +45,7 @@ export default function CreateReview({
         <FormField
           control={form.control}
           name="book_id"
-          render={({ field }) => (
+          render={({ field, fieldState }) => (
             <FormItem>
               <FormLabel>
                 Book <span className="text-destructive">*</span>
@@ -73,6 +73,11 @@ export default function CreateReview({
                 </Select>
               </FormControl>
               <FormMessage />
+              {form.formState.submitCount > 0 &&
+              (!field.value || field.value <= 0) &&
+              !fieldState.error ? (
+                <p className="text-destructive text-sm">Please select book</p>
+              ) : null}
             </FormItem>
           )}
         />
