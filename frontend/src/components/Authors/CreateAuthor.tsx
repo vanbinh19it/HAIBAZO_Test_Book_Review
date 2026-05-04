@@ -47,7 +47,6 @@ export default function CreateAuthor({
                   placeholder="Author name"
                   type="text"
                   {...field}
-                  required
                 />
               </FormControl>
               <FormMessage />

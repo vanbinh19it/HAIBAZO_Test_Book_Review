@@ -58,7 +58,6 @@ export default function CreateBook({
                   placeholder="Book title"
                   type="text"
                   {...field}
-                  required
                 />
               </FormControl>
               <FormMessage />

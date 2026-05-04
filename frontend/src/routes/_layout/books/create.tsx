@@ -12,12 +12,12 @@ import useCustomToast from "@/hooks/useCustomToast"
 import { handleError } from "@/utils"
 
 const formSchema = z.object({
-  title: z.string().trim().min(1, { message: "Please enter name" }),
-  author_id: z.coerce
-    .number<number>()
+  title: z.string().trim().min(1, { message: "Title is required" }),
+  author_id: z
+    .number({ message: "Author is required" })
     .int()
-    .positive({ message: "Please select author" }),
-}) satisfies z.ZodType<CreateBookFormData>
+    .positive({ message: "Author is required" }),
+})
 
 function getAuthorsQueryOptions() {
   return {

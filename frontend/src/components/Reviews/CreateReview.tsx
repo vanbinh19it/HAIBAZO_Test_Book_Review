@@ -90,7 +90,6 @@ export default function CreateReview({
                   className="border-input focus-visible:border-ring focus-visible:ring-ring/50 flex min-h-28 w-full rounded-md border bg-transparent px-3 py-2 text-sm shadow-xs outline-none focus-visible:ring-[3px]"
                   placeholder="Write your review..."
                   {...field}
-                  required
                 />
               </FormControl>
               <FormMessage />
